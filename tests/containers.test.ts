@@ -3,6 +3,7 @@ import LightContainer from "../src/LightContainer";
 import ShippingContainer from "../src/shippingContainer";
 import {Truck} from "../src/truckclass";
 import { Ship } from "../src/ship";
+import  {FindContainersByDestination} from "../src/functions";
 
 describe("LightContainer class", () => {
     test("destination is set from the constructor", () => {
@@ -179,3 +180,25 @@ describe("Ship class with implemented transporter interface", () => {
     });
 })
 
+describe("Test the findContainersByDestination function", () => {
+    test("An array of light containers gets filtered",() => {
+        let newArray:ShippingContainer[] = []
+        let AContainer:ShippingContainer = new LightContainer("China", 2000)
+        let BContainer:ShippingContainer = new LightContainer("Florida", 2000)
+        let CContainer:ShippingContainer = new LightContainer("China", 2000) //Had to use toEqual 
+        newArray.push(AContainer,BContainer,CContainer)
+        expect(FindContainersByDestination(newArray,"China")).toEqual([{"cargoWeight": 2000, "destination": "China"}, {"cargoWeight": 2000, "destination": "China"}])
+        
+    });
+
+    test("An array of HeavyContainer gets filtered by Florida destination",() => {
+
+        let newArray:ShippingContainer[] = []
+        let AContainer:ShippingContainer = new HeavyContainer(30,"China", 2000)
+        let BContainer:ShippingContainer = new HeavyContainer(100,"Florida", 2000)
+        let CContainer:ShippingContainer = new HeavyContainer(3000,"China", 2000) //Had to use toEqual 
+        newArray.push(AContainer,BContainer,CContainer)
+        expect(FindContainersByDestination(newArray,"Florida")).toEqual([{"cargoWeight": 2000, "destination": "Florida", "tareWeight": 100}])
+    })
+    
+});
