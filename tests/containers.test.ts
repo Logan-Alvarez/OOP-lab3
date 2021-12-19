@@ -3,8 +3,8 @@ import LightContainer from "../src/LightContainer";
 import ShippingContainer from "../src/shippingContainer";
 import {Truck} from "../src/truckclass";
 import { Ship } from "../src/ship";
-import  {FindContainersByDestination} from "../src/functions";
-
+import  {FindContainersByDestination, findOverWeightTransporters} from "../src/functions";
+import {Transporter} from "../src/transporter"
 describe("LightContainer class", () => {
     test("destination is set from the constructor", () => {
         let newDestination:LightContainer = new LightContainer("Africa", 0)
@@ -192,13 +192,68 @@ describe("Test the findContainersByDestination function", () => {
     });
 
     test("An array of HeavyContainer gets filtered by Florida destination",() => {
-
         let newArray:ShippingContainer[] = []
         let AContainer:ShippingContainer = new HeavyContainer(30,"China", 2000)
         let BContainer:ShippingContainer = new HeavyContainer(100,"Florida", 2000)
         let CContainer:ShippingContainer = new HeavyContainer(3000,"China", 2000) //Had to use toEqual 
         newArray.push(AContainer,BContainer,CContainer)
         expect(FindContainersByDestination(newArray,"Florida")).toEqual([{"cargoWeight": 2000, "destination": "Florida", "tareWeight": 100}])
-    })
+    });
     
+    test("An array of HeavyContainer gets filtered by Florida destination",() => {
+        let newArray:ShippingContainer[] = []
+        let AContainer:ShippingContainer = new HeavyContainer(30,"China", 2000)
+        let BContainer:ShippingContainer = new HeavyContainer(100,"Florida", 2000)
+        let CContainer:ShippingContainer = new LightContainer("China", 2000) //Had to use toEqual 
+        newArray.push(AContainer,BContainer,CContainer)
+        expect(FindContainersByDestination(newArray,"China")).toEqual([{"cargoWeight": 2000, "destination": "China", "tareWeight": 30}, {"cargoWeight": 2000, "destination": "China"}])
+    });
+    test("An array of HeavyContainer gets filtered by Florida destination",() => {
+        let newArray:ShippingContainer[] = []
+        let AContainer:ShippingContainer = new HeavyContainer(30,"China", 2000)
+        let BContainer:ShippingContainer = new HeavyContainer(100,"Florida", 2000)
+        let CContainer:ShippingContainer = new LightContainer("China", 2000) //Had to use toEqual 
+        newArray.push(AContainer,BContainer,CContainer)
+        expect(FindContainersByDestination(newArray,"Japan")).toEqual([])
+    });
+
 });
+
+describe("findOverWeightTransporters function returns new array of transports that over overweight",() => {
+    test("An array of trucks with some over weight create a new array", () => {
+        let newArray:Transporter[] = [] //Created empyt array for Transporter array
+        let newTransport1:Truck = new Truck(500) //Made new transports:Truck
+        let newTransport2:Truck = new Truck(500)
+        let heavyContainer:ShippingContainer = new HeavyContainer(250,"China", 251)
+        let lightContainer:ShippingContainer = new LightContainer("China", 251) //Made container
+        newTransport1.addContainer(heavyContainer)//Added container to transport 
+        newTransport2.addContainer(lightContainer)
+        newArray.push(newTransport1, newTransport2) //added the transporter:Truck to the array. The transporter is "loaded" with the containers
+        expect(findOverWeightTransporters(newArray)).toEqual([{"container": {"cargoWeight": 251, "destination": "China", "tareWeight": 250}, "maxWeight": 500}])
+    });
+
+    test("An array of trucks and ships with some over weight that create a new array", () => {
+        let newArray:Transporter[] = [] //Created empyt array for Transporter array
+        let newTransport1:Truck = new Truck(500) //Made new transports:Truck
+        let newTransport2:Ship = new Ship(1000)
+        let heavyContainer:ShippingContainer = new HeavyContainer(500,"China", 501)
+        let lightContainer:ShippingContainer = new LightContainer("China", 251) //Made container
+        newTransport1.addContainer(lightContainer)//Added container to transport 
+        newTransport2.addContainer(heavyContainer)
+        newArray.push(newTransport1, newTransport2) //added the transporter:Truck to the array. The transporter is "loaded" with the containers
+        expect(findOverWeightTransporters(newArray)).toEqual([{"containers": [{"cargoWeight": 501, "destination": "China", "tareWeight": 500}], "maxWeight": 1000}])
+    });
+    test("An array of trucks and ships with none that are over weight that create a new empty array", () => {
+        let newArray:Transporter[] = [] //Created empyt array for Transporter array
+        let newTransport1:Truck = new Truck(500) //Made new transports:Truck
+        let newTransport2:Ship = new Ship(1000)
+        let heavyContainer:ShippingContainer = new HeavyContainer(500,"China", 500)
+        let lightContainer:ShippingContainer = new LightContainer("China", 251) //Made container
+        newTransport1.addContainer(lightContainer)//Added container to transport 
+        newTransport2.addContainer(heavyContainer)
+        newArray.push(newTransport1, newTransport2) //added the transporter:Truck to the array. The transporter is "loaded" with the containers
+        expect(findOverWeightTransporters(newArray)).toEqual([])
+    });
+})
+
+
