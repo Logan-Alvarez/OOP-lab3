@@ -1,5 +1,6 @@
 import HeavyContainer from "./HeavyContainer";
 import LightContainer from "./LightContainer";
+import { Ship } from "./ship";
 import ShippingContainer from "./shippingContainer";
 import { Transporter } from "./transporter";
 import { Truck } from "./truckclass";
@@ -24,7 +25,7 @@ export function FindContainersByDestination(containers:ShippingContainer[],desti
 //     console.log(newArray);  
 //     console.log(FindContainersByDestination(newArray,"Florida"))
 
-export function findOverWeightTransporters(transporters:Transporter[]){
+export function findOverWeightTransporters(transporters:Transporter[]):Transporter[]{
     let newArray:Transporter[] = []
     transporters.filter(transporter => {if(transporter.isOverWeight() == true){
         newArray.push(transporter)
@@ -39,6 +40,11 @@ export function findOverWeightTransporters(transporters:Transporter[]){
 // newArray.push(newTransport) //added the transporter:Truck to the array. The transporter is "loaded" with the containers
 // console.log(findOverWeightTransporters(newArray));
 
-
+export function isSafeToAddContainer(ship:Ship, container:ShippingContainer):boolean {
+    if(ship.getTotalWeight() + container.getGrossWeight() <= ship.maxWeight){
+        return true
+    }
+    return false
+}
 
 

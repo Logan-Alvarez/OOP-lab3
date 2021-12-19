@@ -2,6 +2,9 @@ import ShippingContainer from "./shippingContainer";
 import { Transporter } from "./transporter";
 
 export class Ship implements Transporter {
+    isSafeToAddContainer(): any {
+        throw new Error("Method not implemented.");
+    }
     maxWeight: number;
     containers:ShippingContainer[] = [ ];
 

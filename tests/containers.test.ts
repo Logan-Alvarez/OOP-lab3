@@ -3,8 +3,9 @@ import LightContainer from "../src/LightContainer";
 import ShippingContainer from "../src/shippingContainer";
 import {Truck} from "../src/truckclass";
 import { Ship } from "../src/ship";
-import  {FindContainersByDestination, findOverWeightTransporters} from "../src/functions";
+import  {FindContainersByDestination, findOverWeightTransporters,isSafeToAddContainer} from "../src/functions";
 import {Transporter} from "../src/transporter"
+
 describe("LightContainer class", () => {
     test("destination is set from the constructor", () => {
         let newDestination:LightContainer = new LightContainer("Africa", 0)
@@ -254,6 +255,53 @@ describe("findOverWeightTransporters function returns new array of transports th
         newArray.push(newTransport1, newTransport2) //added the transporter:Truck to the array. The transporter is "loaded" with the containers
         expect(findOverWeightTransporters(newArray)).toEqual([])
     });
+
 })
 
+describe("isSafetoAddContainer function works by returning true or false",() => {
+    test("A ship with maxWeight of 5000 loaded with an empty container returns true",() => {
+        let newShip:Ship = new Ship(5000)
+        let lightContainer = new LightContainer("Africa", 0)
+        newShip.addContainer(lightContainer)
+        expect(isSafeToAddContainer(newShip,lightContainer)).toBe(true)
+    });
+    test("A ship with maxWeight of 5000 loaded with a container with light load - returns true",() => {
+        let newShip:Ship = new Ship(5000)
+        let lightContainer = new LightContainer("Africa", 30)
+        newShip.addContainer(lightContainer)
+        expect(isSafeToAddContainer(newShip,lightContainer)).toBe(true)
+    });
+    test("A ship with maxWeight of 5000 loaded with a container with light load - returns true",() => {
+        let newShip:Ship = new Ship(5000)
+        let heavyContainer = new HeavyContainer(500, "Africa", 30)
+        newShip.addContainer(heavyContainer)
+        expect(isSafeToAddContainer(newShip,heavyContainer)).toBe(true)
+    });
+    test("A ship with maxWeight of 5000 loaded with a container of maxWeight - returns false",() => {
+        let newShip:Ship = new Ship(5000)
+        let lightContainer = new LightContainer("Africa", 5001)
+        newShip.addContainer(lightContainer)
+        expect(isSafeToAddContainer(newShip,lightContainer)).toBe(false)
+    });
+    test("A ship with maxWeight of 5000 loaded with a container with light load - returns true",() => {
+        let newShip:Ship = new Ship(5000)
+        let heavyContainer = new HeavyContainer(2500, "Africa", 2501)
+        newShip.addContainer(heavyContainer)
+        expect(isSafeToAddContainer(newShip,heavyContainer)).toBe(false)
+    });
+    test("isSafeToAddContainer returns true for an empty ship and a container with the same gross weight as the maxWeight.",() => {
+        let newShip:Ship = new Ship(5000)
+        let lightContainer = new LightContainer("Africa", 5000)
+        expect(isSafeToAddContainer(newShip,lightContainer)).toBe(true)
+    });
+    test("Create a ship with one or more containers already added. isSafeToAddContainer returns false for a container that is too heavy to be added to this ship.",() => {
+        let newShip:Ship = new Ship(5000)
+        let heavyContainer = new HeavyContainer(2500, "Africa", 2500)
+        let anotherContainer = new LightContainer("France", 30)
+        newShip.addContainer(heavyContainer)
+        expect(isSafeToAddContainer(newShip,anotherContainer)).toBe(false)
+    });
+
+
+})
 
